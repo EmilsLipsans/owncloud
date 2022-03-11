@@ -210,7 +210,7 @@ def build_and_test_client(ctx, c_compiler, cxx_compiler, build_type, generator, 
 def gui_tests(ctx, trigger = {}, depends_on = [], filterTags = [], version = "daily-master-qa"):
     pipeline_name = "GUI-tests"
     build_dir = "build-" + pipeline_name
-    squish_parameters = "--retry 1 --reportgen html,%s --envvar LC_TIME=de_DE.UTF-8 --tags @issue-9321" % GUI_TEST_REPORT_DIR
+    squish_parameters = "--retry 1 --reportgen html,%s --envvar QT_LOGGING_RULES=sync.httplogger=true;gui.socketapi=false --tags @issue-9321" % GUI_TEST_REPORT_DIR
 
     if (len(filterTags) > 0):
         for tags in filterTags:
@@ -244,6 +244,7 @@ def gui_tests(ctx, trigger = {}, depends_on = [], filterTags = [], version = "da
                          "name": "GUItests",
                          "image": OC_CI_SQUISH,
                          "environment": {
+                             "LC_TIME": "de_DE.UTF-8",
                              "LICENSEKEY": from_secret("squish_license_server"),
                              "GUI_TEST_REPORT_DIR": GUI_TEST_REPORT_DIR,
                              "CLIENT_REPO": "/drone/src/",
