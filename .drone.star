@@ -259,6 +259,7 @@ def gui_tests(ctx, trigger = {}, depends_on = [], filterTags = [], version = "da
                  # GUI test result has been disabled for now, as we squish can not produce the result in both html and json format.
                  # Disabled untill the feature to generate json result is implemented in squish, or some other method to reuse the log parser is implemented.
                  #  showGuiTestResult() +
+                 findFlakyTests() +
                  uploadGuiTestLogs() +
                  buildGithubComment(pipeline_name) +
                  githubComment(pipeline_name),
@@ -606,11 +607,6 @@ def uploadGuiTestLogs():
                 "from_secret": "cache_public_s3_secret_key",
             },
         },
-        "when": {
-            "status": [
-                "failure",
-            ],
-        },
     }]
 
 def buildGithubComment(suite):
@@ -630,9 +626,6 @@ def buildGithubComment(suite):
             },
         },
         "when": {
-            "status": [
-                "failure",
-            ],
             "event": [
                 "pull_request",
             ],
@@ -656,9 +649,6 @@ def githubComment(alternateSuiteName):
             "if [ -s %s/comments.file ]; then echo '%s' | cat - %s/comments.file > temp && mv temp %s/comments.file && /bin/drone-github-comment; fi" % (GUI_TEST_REPORT_DIR, prefix, GUI_TEST_REPORT_DIR, GUI_TEST_REPORT_DIR),
         ],
         "when": {
-            "status": [
-                "failure",
-            ],
             "event": [
                 "pull_request",
             ],
@@ -687,4 +677,13 @@ def cancelPreviousBuilds():
                 "refs/pull/**",
             ],
         },
+    }
+
+def findFlakyTests():
+    return {
+        "name": "find-flaky-tests",
+        "image": OC_UBUNTU,
+        "commands": [
+            "bash /drone/src/test/gui/drone/find_flaky.sh %s/failed_tests.txt" % GUI_TEST_REPORT_DIR,
+        ],
     }
