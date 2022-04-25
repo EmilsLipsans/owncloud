@@ -708,7 +708,7 @@ def step(context, filename):
     activity.checkBlackListedFileExist(filename)
 
 
-@Then('at least a file should be blacklisted')
+@When('the user waits until at least a file is blacklisted')
 def step(context):
     activity = Activity()
     activity.checkAtLeastABlacklistedFile()
