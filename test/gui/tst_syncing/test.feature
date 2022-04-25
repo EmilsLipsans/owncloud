@@ -257,6 +257,20 @@ Feature: Syncing files
         Then the file "Folder1/a\\a.txt" should be blacklisted
 
 
+    Scenario: Filenames that are rejected by the server are reported
+        Given user "Alice" has set up a client with default settings
+        And user "Alice" has created a folder "Folder1" inside the sync folder
+        When the user waits for folder "Folder1" to be synced
+        And user "Alice" creates a file "Folder1/a\\a.txt" with the following content inside the sync folder
+            """
+            test content
+            """
+        Then as "Alice" folder "Folder1" should exist on the server
+        When the user clicks on the activity tab
+        And the user selects "Not Synced" tab in the activity
+        Then at least a file should be blacklisted
+
+
     Scenario Outline: Verify one empty folder with a length longer than the allowed limit will not be synced
         Given user "Alice" has set up a client with default settings
         And user "Alice" has created a folder "<foldername>" inside the sync folder
